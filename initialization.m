@@ -1,0 +1,100 @@
+function initialization(MT_numb_M,MT_numb_D)
+    % Import parameters
+    parameters();
+
+    % Global variables
+    global MT_Pos_M MT_Pos_D MT_Growing_M MT_Growing_D MT_GrowthVel_M ...
+           MT_GrowthVel_D MT_Contact_M MT_Contact_D basePosM basePosD ...
+           force_M force_D proNucPos psi force torque torque_M torque_D contacts ...
+           regionPos generator stdNormalDist;
+
+     global pi MT_numb_M MT_numb_D Vg Vs Vs_c Pr_catastrophe Pr_rescue ...
+           numberContactWindows numRegions regionAngles regionForceMultipliers ...
+           regionProbabilities contactWindowAngles BasePosVecX BasePosVecY ...
+           R1_max R2_max Prad F_MT Tau Duration Eta Mu D Fratio kM kD ...
+           contact_length translation motherSpringOn daughterSpringOn;
+
+
+% [pi MT_numb_M MT_numb_D Vg Vs Vs_c Pr_catastrophe Pr_rescue ...
+%            numberContactWindows numRegions regionAngles regionForceMultipliers ...
+%            regionProbabilities contactWindowAngles BasePosVecX BasePosVecY ...
+%            R1_max R2_max Prad F_MT Tau Duration Eta Mu D Fratio kM kD ...
+%            contact_length translation motherSpringOn daughterSpringOn]=parameters();
+
+
+    % Initialize variables
+    MT_Pos_M = zeros(MT_numb_M, 2); % Vector positions for MTs (Mother)
+    MT_Pos_D = zeros(MT_numb_D, 2); % Vector positions for MTs (Daughter)
+    MT_Growing_M = true(1, MT_numb_M); % Boolean flags for growth (Mother)
+    MT_Growing_D = true(1, MT_numb_D); % Boolean flags for growth (Daughter)
+    MT_GrowthVel_M = Vg * ones(1, MT_numb_M); % Growth velocities (Mother)
+    MT_GrowthVel_D = Vg * ones(1, MT_numb_D); % Growth velocities (Daughter)
+    MT_Contact_M = zeros(1, MT_numb_M); % Contact times (Mother)
+    MT_Contact_D = zeros(1, MT_numb_D); % Contact times (Daughter)
+    contacts = false(1, numberContactWindows); % Contact status
+    regionPos = zeros(numRegions, 2); % Region positions
+
+    % Initialize vectors
+    basePosM = [BasePosVecX, BasePosVecY];
+    basePosD = [-BasePosVecX, -BasePosVecY];
+    proNucPos = [0.0, 0.0];
+    psi = 0.0;
+    force = 0.0;
+    torque = 0.0;
+    force_M = [0.0, 0.0];
+    force_D = [0.0, 0.0];
+    torque_M = 0.0;
+    torque_D = 0.0;
+
+    % Setup the regions and seed random generator
+    for i = 1:numRegions
+        angle = (regionAngles(i) + regionAngles(i+1)) / 2.0;
+        regionPos(i, :) = [cos(angle), sin(angle)];
+    end
+    rng('shuffle'); % Seed random generator
+    stdNormalDist = @(x) randn(x); % Normal distribution generator
+end
+
+function val = testStat()
+    % Generate a test statistic from a standard normal distribution
+    val = stdNormalDist(1);
+end
+
+function setToBasePos()
+    % Reset variables to base positions
+    global basePosM basePosD proNucPos psi force torque force_M ...
+           force_D torque_M torque_D MT_Pos_M MT_Pos_D MT_Growing_M ...
+           MT_Growing_D MT_GrowthVel_M MT_GrowthVel_D MT_Contact_M ...
+           MT_Contact_D contacts;
+
+    basePosM = [BasePosVecX, BasePosVecY];
+    basePosD = [-BasePosVecX, -BasePosVecY];
+    proNucPos = [0.0, 0.0];
+    psi = 0.0;
+    force = 0.0;
+    torque = 0.0;
+    force_M = [0.0, 0.0];
+    force_D = [0.0, 0.0];
+    torque_M = 0.0;
+    torque_D = 0.0;
+    MT_Pos_M = zeros(MT_numb_M, 2);
+    MT_Pos_D = zeros(MT_numb_D, 2);
+    MT_Growing_M = true(1, MT_numb_M);
+    MT_Growing_D = true(1, MT_numb_D);
+    MT_GrowthVel_M = Vg * ones(1, MT_numb_M);
+    MT_GrowthVel_D = Vg * ones(1, MT_numb_D);
+    MT_Contact_M = zeros(1, MT_numb_M);
+    MT_Contact_D = zeros(1, MT_numb_D);
+    contacts = false(1, numberContactWindows);
+end
+
+function setup()
+    % Setup initial positions and configurations
+    setToBasePos();
+    global regionPos numRegions regionAngles;
+    for i = 1:numRegions
+        angle = (regionAngles(i) + regionAngles(i+1)) / 2.0;
+        regionPos(i, :) = [cos(angle), sin(angle)];
+    end
+    rng('shuffle');
+end
