@@ -20,8 +20,8 @@ clear all;
     initialization(100,100);  % Initialize parameters and variables
 
     %% I tried with 10000,10000 and led to computer hanging
-
-    % Simulation settings
+    
+    %% Simulation settings
     numRuns = 1;      % Number of simulation runs
     writeAllData = false; % Flag to write all data
     writeTempData = false; % Flag to write temporary data
